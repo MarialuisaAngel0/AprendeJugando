@@ -1,0 +1,373 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  background: linear-gradient(135deg, #dff7ff, #fff0cf, #fce4ff);
+  min-height: 100vh;
+  color: #344054;
+}
+
+.contenedor {
+  min-height: 100vh;
+  padding: 35px 20px;
+  text-align: center;
+}
+
+header {
+  margin-bottom: 30px;
+}
+
+.logo {
+  font-size: 65px;
+}
+
+h1 {
+  color: #7353d6;
+  font-size: clamp(32px, 6vw, 48px);
+  margin: 10px 0;
+}
+
+header p {
+  font-size: 20px;
+}
+
+.tarjeta {
+  background: white;
+  max-width: 480px;
+  margin: auto;
+  padding: 35px;
+  border-radius: 25px;
+  box-shadow: 0 12px 35px #7353d625;
+}
+
+h2 {
+  color: #7353d6;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  margin-top: 25px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input, select {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #ded8f8;
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+  color: #344054;
+}
+
+input:focus, select:focus {
+  outline: 2px solid #987cf1;
+}
+
+button {
+  margin-top: 15px;
+  padding: 16px;
+  background: #7957df;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #6241c4;
+}
+
+footer {
+  margin-top: 35px;
+  color: #667085;
+}
+
+
+
+
+/* ACTIVIDADES EDUCATIVAS */
+
+.tarjeta-actividades {
+  width: min(900px, 95%);
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.lista-actividades {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(220px, 1fr)
+  );
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.actividad-card {
+  background: #ffffff;
+  border: 2px solid #e9ddff;
+  border-radius: 20px;
+  padding: 25px 18px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(100, 70, 180, 0.1);
+  transition: transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.actividad-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(100, 70, 180, 0.18);
+}
+
+.actividad-icono {
+  font-size: 45px;
+  margin-bottom: 12px;
+}
+
+.actividad-card h3 {
+  color: #7950df;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.actividad-card p {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 45px;
+}
+
+.actividad-card button {
+  background: #7950df;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.actividad-card button:hover {
+  background: #6336d2;
+}
+
+.boton-volver {
+  margin-top: 20px;
+  background: #7950df;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  cursor: pointer;
+}
+
+.detalle-actividad {
+  margin-top: 25px;
+  padding: 25px;
+  background: #f8f4ff;
+  border-radius: 20px;
+}
+
+.detalle-actividad h2 {
+  color: #7950df;
+}
+
+.detalle-actividad button {
+  margin-top: 20px;
+}
+
+.mensaje-error {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .lista-actividades {
+    grid-template-columns: 1fr;
+  }
+
+  .tarjeta-actividades {
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+
+
+/* JUEGOS INTERACTIVOS */
+
+.juego-contenido {
+  text-align: center;
+  padding: 20px;
+}
+
+.juego-contenido h2 {
+  color: #7950df;
+}
+
+.juego-contenido h3 {
+  font-size: 24px;
+  margin: 25px 0;
+}
+
+.opciones-juego {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 15px;
+  margin: 25px auto;
+  max-width: 650px;
+}
+
+.opciones-juego button {
+  padding: 18px;
+  background: #eee6ff;
+  color: #5630ad;
+  border: 2px solid #d6c3ff;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.opciones-juego button:hover:not(:disabled) {
+  background: #ded0ff;
+}
+
+.opciones-juego .opcion-correcta {
+  background: #c9f7d3;
+  border-color: #39a65a;
+  color: #176b32;
+}
+
+.opciones-juego .opcion-incorrecta {
+  background: #ffd7d7;
+  border-color: #e74c3c;
+  color: #9b2525;
+}
+
+.tablero-memoria {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  max-width: 440px;
+  margin: 25px auto;
+}
+
+.carta-memoria {
+  aspect-ratio: 1;
+  font-size: 32px;
+  border-radius: 14px;
+  background: #e9ddff;
+  border: 2px solid #c7a9ff;
+  cursor: pointer;
+}
+
+.carta-memoria:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.resultado-juego {
+  background: #f5efff;
+  border-radius: 20px;
+  padding: 30px;
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+.resultado-juego h1 {
+  font-size: 48px;
+  color: #7950df;
+}
+
+.resultado-juego h2 {
+  color: #7950df;
+}
+
+@media (max-width: 500px) {
+  .tablero-memoria {
+    gap: 8px;
+  }
+
+  .carta-memoria {
+    font-size: 25px;
+  }
+
+  .opciones-juego {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* PANEL DE PROGRESO */
+
+.resumen-progreso {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 30px 0;
+  width: 100%;
+}
+
+.resumen-progreso .actividad-card {
+  padding: 24px 12px;
+  min-width: 0;
+  text-align: center;
+  border: 2px solid #e9d5ff;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.08);
+}
+
+.resumen-progreso .actividad-icono {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.resumen-progreso h3 {
+  font-size: 16px;
+  color: #7c3aed;
+}
+
+.resumen-progreso h2 {
+  font-size: 28px;
+  color: #6d28d9;
+  margin-top: 12px;
+}
+
+.historial-progreso {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.historial-progreso .actividad-card {
+  padding: 20px;
+}
+
+@media (max-width: 650px) {
+  .resumen-progreso {
+    grid-template-columns: 1fr;
+  }
+
+  .historial-progreso {
+    grid-template-columns: 1fr;
+  }
+}
