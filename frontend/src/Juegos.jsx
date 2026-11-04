@@ -41,76 +41,156 @@ const preguntas = {
 
 const parejasMemoria = ['🐶', '🐱', '🐸', '🦋', '🌸', '⭐'];
 
+function mezclarCartas() {
+  const cartas = [...parejasMemoria, ...parejasMemoria]
+    .map((emoji, id) => ({
+      id,
+      emoji,
+      encontrada: false
+    }));
+
+  for (let i = cartas.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cartas[i], cartas[j]] = [cartas[j], cartas[i]];
+  }
+
+  return cartas;
+}
+
+function obtenerClaseOpcion(opcion, respuesta, correcta) {
+  if (respuesta === null) {
+    return '';
+  }
+
+  if (opcion === correcta) {
+    return 'opcion-correcta';
+  }
+
+  if (opcion === respuesta) {
+    return 'opcion-incorrecta';
+  }
+
+  return '';
+}
+
 function JuegoMemoria({ finalizar }) {
-  const [cartas, setCartas] = useState(() =>
-    [...parejasMemoria, ...parejasMemoria]
-      .map((emoji, i) => ({ id: i, emoji, encontrada: false }))
-      .sort(() => Math.random() - 0.5)
-  );
+  const [cartas, setCartas] = useState(mezclarCartas);
   const [seleccionadas, setSeleccionadas] = useState([]);
   const [intentos, setIntentos] = useState(0);
+  const [finalizando, setFinalizando] = useState(false);
 
   useEffect(() => {
-    if (seleccionadas.length !== 2) return;
+    if (seleccionadas.length !== 2) {
+      return undefined;
+    }
 
     const [a, b] = seleccionadas;
 
     if (cartas[a].emoji === cartas[b].emoji) {
       setCartas(actual =>
-        actual.map((c, i) =>
-          i === a || i === b ? { ...c, encontrada: true } : c
-        )
+        actual.map((carta, indice) => {
+          if (indice === a || indice === b) {
+            return { ...carta, encontrada: true };
+          }
+
+          return carta;
+        })
       );
+
       setSeleccionadas([]);
-    } else {
-      const temporizador = setTimeout(() => setSeleccionadas([]), 850);
-      return () => clearTimeout(temporizador);
+      return undefined;
     }
+
+    const temporizador = setTimeout(() => {
+      setSeleccionadas([]);
+    }, 850);
+
+    return () => clearTimeout(temporizador);
   }, [seleccionadas, cartas]);
 
-  const encontradas = cartas.filter(c => c.encontrada).length / 2;
+  const encontradas =
+    cartas.filter(carta => carta.encontrada).length / 2;
 
-  function elegir(i) {
-    if (seleccionadas.length === 2 ||
-        seleccionadas.includes(i) ||
-        cartas[i].encontrada) return;
+  function elegir(indice) {
+    if (
+      seleccionadas.length === 2 ||
+      seleccionadas.includes(indice) ||
+      cartas[indice].encontrada ||
+      finalizando
+    ) {
+      return;
+    }
 
-    setSeleccionadas(actual => [...actual, i]);
+    setSeleccionadas(actual => [...actual, indice]);
 
     if (seleccionadas.length === 1) {
       setIntentos(actual => actual + 1);
     }
   }
 
+  function terminarMemoria() {
+    if (finalizando) {
+      return;
+    }
+
+    setFinalizando(true);
+    finalizar(100, 6, 6);
+  }
+
   return (
     <div className="juego-contenido">
       <h2>🧠 Juego de memoria</h2>
+
       <p>Encuentra las seis parejas de animales y figuras.</p>
-      <p>Parejas: {encontradas}/6 · Intentos: {intentos}</p>
+
+      <p>
+        Parejas: {encontradas}/6 · Intentos: {intentos}
+      </p>
 
       <div className="tablero-memoria">
-        {cartas.map((carta, i) => (
-          <button
-            key={carta.id}
-            type="button"
-            className="carta-memoria"
-            onClick={() => elegir(i)}
-            disabled={carta.encontrada || seleccionadas.includes(i)}
-            aria-label={`Carta ${i + 1}`}
-          >
-            {carta.encontrada || seleccionadas.includes(i)
-              ? carta.emoji
-              : '❓'}
-          </button>
-        ))}
+        {cartas.map((carta, indice) => {
+          const visible =
+            carta.encontrada ||
+            seleccionadas.includes(indice);
+
+          return (
+            <button
+              key={carta.id}
+              type="button"
+              className="carta-memoria"
+              onClick={() => elegir(indice)}
+              disabled={
+                carta.encontrada ||
+                seleccionadas.includes(indice) ||
+                seleccionadas.length === 2 ||
+                finalizando
+              }
+              aria-label={
+                visible
+                  ? `Carta ${indice + 1}: ${carta.emoji}`
+                  : `Carta ${indice + 1}: oculta`
+              }
+            >
+              {visible ? carta.emoji : '❓'}
+            </button>
+          );
+        })}
       </div>
 
-      {encontradas === 6 && (
+      {encontradas === parejasMemoria.length && (
         <div className="resultado-juego">
           <h2>🎉 ¡Encontraste todas las parejas!</h2>
-          <p>Completaste el juego en {intentos} intentos.</p>
-          <button onClick={() => finalizar(100, 6, 6)}>
-            Ver resultado
+
+          <p>
+            Completaste el juego en {intentos} intentos.
+          </p>
+
+          <button
+            type="button"
+            onClick={terminarMemoria}
+            disabled={finalizando}
+          >
+            {finalizando ? '⏳ Guardando...' : 'Ver resultado'}
           </button>
         </div>
       )}
@@ -118,18 +198,20 @@ function JuegoMemoria({ finalizar }) {
   );
 }
 
-export default function Juegos({ actividad, finalizar, volver }) {
+function JuegoPreguntas({ actividad, finalizar, volver }) {
   const [indice, setIndice] = useState(0);
   const [puntos, setPuntos] = useState(0);
   const [respuesta, setRespuesta] = useState(null);
   const [terminado, setTerminado] = useState(false);
+  const [finalizando, setFinalizando] = useState(false);
 
-  const esMemoria = actividad.nombre === 'Juego de memoria';
   const lista = preguntas[actividad.nombre] || [];
   const pregunta = lista[indice];
 
   function responder(opcion) {
-    if (respuesta !== null) return;
+    if (respuesta !== null || finalizando) {
+      return;
+    }
 
     setRespuesta(opcion);
 
@@ -141,28 +223,33 @@ export default function Juegos({ actividad, finalizar, volver }) {
   function siguiente() {
     if (indice + 1 >= lista.length) {
       setTerminado(true);
-    } else {
-      setIndice(actual => actual + 1);
-      setRespuesta(null);
+      return;
     }
+
+    setIndice(actual => actual + 1);
+    setRespuesta(null);
   }
 
-  if (esMemoria) {
-    return (
-      <div>
-        <JuegoMemoria finalizar={finalizar} />
-        <button className="boton-volver" onClick={volver}>
-          ← Volver a las actividades
-        </button>
-      </div>
-    );
+  function terminarPreguntas() {
+    if (finalizando) {
+      return;
+    }
+
+    setFinalizando(true);
+
+    const correctas = puntos / 20;
+
+    finalizar(puntos, correctas, lista.length);
   }
 
-  if (!lista.length) {
+  if (lista.length === 0) {
     return (
-      <div>
+      <div className="juego-contenido">
         <p>Esta actividad todavía no tiene preguntas.</p>
-        <button onClick={volver}>Volver</button>
+
+        <button type="button" onClick={volver}>
+          Volver
+        </button>
       </div>
     );
   }
@@ -171,10 +258,19 @@ export default function Juegos({ actividad, finalizar, volver }) {
     return (
       <div className="resultado-juego">
         <h2>🏆 ¡Actividad completada!</h2>
+
         <h1>{puntos}/100 puntos</h1>
-        <p>Respuestas correctas: {puntos / 20} de {lista.length}</p>
-        <button onClick={() => finalizar(puntos, puntos / 20, lista.length)}>
-          Ver resultado
+
+        <p>
+          Respuestas correctas: {puntos / 20} de {lista.length}
+        </p>
+
+        <button
+          type="button"
+          onClick={terminarPreguntas}
+          disabled={finalizando}
+        >
+          {finalizando ? '⏳ Guardando...' : 'Ver resultado'}
         </button>
       </div>
     );
@@ -183,7 +279,11 @@ export default function Juegos({ actividad, finalizar, volver }) {
   return (
     <div className="juego-contenido">
       <h2>🎮 {actividad.nombre}</h2>
-      <p>Pregunta {indice + 1} de {lista.length}</p>
+
+      <p>
+        Pregunta {indice + 1} de {lista.length}
+      </p>
+
       <h3>{pregunta.pregunta}</h3>
 
       <div className="opciones-juego">
@@ -193,13 +293,11 @@ export default function Juegos({ actividad, finalizar, volver }) {
             type="button"
             disabled={respuesta !== null}
             onClick={() => responder(opcion)}
-            className={
-              respuesta !== null && opcion === pregunta.correcta
-                ? 'opcion-correcta'
-                : respuesta === opcion
-                  ? 'opcion-incorrecta'
-                  : ''
-            }
+            className={obtenerClaseOpcion(
+              opcion,
+              respuesta,
+              pregunta.correcta
+            )}
           >
             {opcion}
           </button>
@@ -213,7 +311,8 @@ export default function Juegos({ actividad, finalizar, volver }) {
               ? '🌟 ¡Muy bien! Respuesta correcta.'
               : `💡 La respuesta correcta es: ${pregunta.correcta}`}
           </p>
-          <button onClick={siguiente}>
+
+          <button type="button" onClick={siguiente}>
             {indice + 1 === lista.length
               ? 'Finalizar actividad 🏆'
               : 'Siguiente pregunta →'}
@@ -221,9 +320,43 @@ export default function Juegos({ actividad, finalizar, volver }) {
         </div>
       )}
 
-      <button className="boton-volver" onClick={volver}>
+      <button
+        type="button"
+        className="boton-volver"
+        onClick={volver}
+      >
         ← Volver a las actividades
       </button>
     </div>
+  );
+}
+
+export default function Juegos({
+  actividad,
+  finalizar,
+  volver
+}) {
+  if (actividad.nombre === 'Juego de memoria') {
+    return (
+      <div>
+        <JuegoMemoria finalizar={finalizar} />
+
+        <button
+          type="button"
+          className="boton-volver"
+          onClick={volver}
+        >
+          ← Volver a las actividades
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <JuegoPreguntas
+      actividad={actividad}
+      finalizar={finalizar}
+      volver={volver}
+    />
   );
 }
